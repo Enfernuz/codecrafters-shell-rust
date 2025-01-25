@@ -1,8 +1,10 @@
 #[allow(unused_imports)]
 use std::io::{self, Write};
-use std::process::exit;
+use std::{collections::HashSet, process::exit};
 
 fn main() {
+    let commands: HashSet<&str> = HashSet::from(["exit", "echo", "type"]);
+
     loop {
         print!("$ ");
         io::stdout().flush().unwrap();
@@ -27,6 +29,18 @@ fn main() {
                 }
             }
             "echo" => println!("{}", args.join(" ")),
+            "type" => {
+                if args.len() == 1 {
+                    let cmd: &str = args[0];
+                    if commands.contains(cmd) {
+                        println!("{cmd} is a shell builtin");
+                    } else {
+                        println!("{cmd} not found");
+                    }
+                } else {
+                    panic!("The `type` command must have exactly 1 argument, e.g. `type echo`");
+                }
+            }
             _ => println!("{command}: command not found"),
         }
     }
