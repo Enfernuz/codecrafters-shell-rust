@@ -7,7 +7,7 @@ use std::process::{Command, ExitStatus};
 use std::{collections::HashMap, collections::HashSet, process::exit};
 
 fn main() {
-    let builtins: HashSet<&str> = HashSet::from(["exit", "echo", "type"]);
+    let builtins: HashSet<&str> = HashSet::from(["exit", "echo", "type", "pwd"]);
     let executables: HashMap<String, String> = get_path_executables();
 
     loop {
@@ -35,6 +35,7 @@ fn main() {
             }
             "echo" => println!("{}", args.join(" ")),
             "type" => handle_type(args, &builtins, &executables),
+            "pwd" => handle_pwd(),
             _ => {
                 if executables.contains_key(command) {
                     exec(command, args);
@@ -51,6 +52,17 @@ fn exec(program: &str, args: &[&str]) {
         .args(args)
         .status()
         .expect("Program `{program}` failed to execute");
+}
+
+fn handle_pwd() {
+    println!(
+        "{}",
+        fs::canonicalize(".")
+            .unwrap()
+            .into_os_string()
+            .into_string()
+            .unwrap()
+    );
 }
 
 fn handle_type(args: &[&str], builtins: &HashSet<&str>, executables: &HashMap<String, String>) {
