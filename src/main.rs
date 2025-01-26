@@ -36,6 +36,7 @@ fn main() {
             "echo" => println!("{}", args.join(" ")),
             "type" => handle_type(args, &builtins, &executables),
             "pwd" => handle_pwd(),
+            "cd" => handle_cd(args),
             _ => {
                 if executables.contains_key(command) {
                     exec(command, args);
@@ -63,6 +64,19 @@ fn handle_pwd() {
             .into_string()
             .unwrap()
     );
+}
+
+fn handle_cd(args: &[&str]) {
+    match args.len() {
+        1 => match env::set_current_dir(args[0]) {
+            Err(_) => println!("cd: {}: No such file or directory", args[0]),
+            _ => (),
+        },
+        _ => panic!(
+            "The `cd` command should have exactly 1 argument (but got {}), e.g. `cd /usr/bin`",
+            args.len()
+        ),
+    }
 }
 
 fn handle_type(args: &[&str], builtins: &HashSet<&str>, executables: &HashMap<String, String>) {
