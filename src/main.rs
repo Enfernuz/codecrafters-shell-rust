@@ -68,7 +68,11 @@ fn handle_pwd() {
 
 fn handle_cd(args: &[&str]) {
     if args.len() == 1 {
-        let path = fs::canonicalize(args[0]);
+        let _path: &str = match args[0] {
+            "~" => &env::var("HOME").expect("Could not read the HOME env variable."),
+            other => other,
+        };
+        let path = fs::canonicalize(_path);
         if path.is_err() || env::set_current_dir(path.unwrap().as_path()).is_err() {
             println!("cd: {}: No such file or directory", args[0]);
         }
