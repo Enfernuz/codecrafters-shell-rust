@@ -67,15 +67,16 @@ fn handle_pwd() {
 }
 
 fn handle_cd(args: &[&str]) {
-    match args.len() {
-        1 => match env::set_current_dir(args[0]) {
-            Err(_) => println!("cd: {}: No such file or directory", args[0]),
-            _ => (),
-        },
-        _ => panic!(
+    if args.len() == 1 {
+        let path = fs::canonicalize(args[0]);
+        if path.is_err() || env::set_current_dir(path.unwrap().as_path()).is_err() {
+            println!("cd: {}: No such file or directory", args[0]);
+        }
+    } else {
+        panic!(
             "The `cd` command should have exactly 1 argument (but got {}), e.g. `cd /usr/bin`",
             args.len()
-        ),
+        );
     }
 }
 
