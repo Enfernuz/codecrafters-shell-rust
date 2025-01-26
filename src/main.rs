@@ -3,6 +3,7 @@ use std::env;
 use std::fs;
 use std::io::{self, Write};
 use std::os::unix::fs::PermissionsExt;
+use std::process::{Command, ExitStatus};
 use std::{collections::HashMap, collections::HashSet, process::exit};
 
 fn main() {
@@ -34,9 +35,22 @@ fn main() {
             }
             "echo" => println!("{}", args.join(" ")),
             "type" => handle_type(args, &builtins, &executables),
-            _ => println!("{command}: command not found"),
+            _ => {
+                if executables.contains_key(command) {
+                    exec(command, args);
+                } else {
+                    println!("{command}: command not found");
+                }
+            }
         }
     }
+}
+
+fn exec(program: &str, args: &[&str]) {
+    let _status: ExitStatus = Command::new(program)
+        .args(args)
+        .status()
+        .expect("Program `{program}` failed to execute");
 }
 
 fn handle_type(args: &[&str], builtins: &HashSet<&str>, executables: &HashMap<String, String>) {
