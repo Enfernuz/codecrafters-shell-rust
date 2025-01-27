@@ -5,6 +5,7 @@ use std::io::{self, Write};
 use std::os::unix::fs::PermissionsExt;
 use std::process::{Command, ExitStatus};
 use std::{collections::HashMap, collections::HashSet, process::exit};
+use shlex;
 
 #[derive(Debug)]
 struct UserInput {
